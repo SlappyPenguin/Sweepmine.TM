@@ -68,6 +68,8 @@ cd run
 python visualiser.py
 ```
 
+An example mid-game board screen is shown below:
+
 <p align="center">
   <img src="images/visualiser.png" width="500"><br>
 </p>
