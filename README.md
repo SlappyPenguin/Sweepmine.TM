@@ -95,7 +95,7 @@ By building a system of these linear equations, we have a general way to determi
 ### (3) Backtracking + Guessing
 If (1) and (2) do not yield certain moves, we are forced to make probabilistic decisions. First, all possible solutions to the CSP (taking valid variables as all unrevealed cells bordering revealed ones) are generated using recursive backtracking.
 
-This backtrack is heavily optimised using a combination of early-exit conditions and heuristic state prioritisations. Furthermore, we reduce state-space by splitting variables into a set of independent 'connected components'. These optimisations make this theoretically exponential-time algorithm run extremely fast in practice.
+This backtrack is heavily optimised using a combination of early-exit conditions and heuristic state prioritisations. Furthermore, we reduce state-space by splitting variables into independent sets. These optimisations make this theoretically exponential-time algorithm run extremely fast in practice.
 
 Basic combinatorics allows us to assign an 'entropy' (moreso the microscopic configuration number $\Omega$) to each cell state. The probability of a cell being in said state then directly correlates to this entropic value. Ties are broken with [heuristic preference for corners and edges](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
 
