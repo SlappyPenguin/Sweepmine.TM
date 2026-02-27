@@ -20,7 +20,7 @@ for _ in range(num_games):
     grader_program.stdin.flush()
     answer = grader_program.stdout.readline().decode().strip()
     
-    end_time = time.time();
+    end_time = time.time()
     total_time += end_time - start_time
 
     print("Game", str(_+1)+":", answer)
