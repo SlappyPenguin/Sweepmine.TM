@@ -1,6 +1,6 @@
 # Sweepmine.TM
 
-A fast Minesweeper algorithm with success rate on par with frontier research models. The solver abstracts the Minesweeper grid into a constraint satisfaction problem (CSP), while solving forced risk positions with probabilistic strategies. The solver also supports toroidal maps (wrap-around) and weighted mines. 
+A fast Minesweeper algorithm with success rate on par with frontier research models. The solver abstracts the Minesweeper grid into a constraint satisfaction problem (CSP), while solving forced risk positions with probabilistic strategies. The solver also supports toroidal (wrap-around) maps and weighted mines. 
 
 This project was originally intended as a problem for a contest setting (see [`statement.pdf`](statement.pdf)). 
 
@@ -50,7 +50,7 @@ Enter level (easy/medium/hard): hard
 Enter number of games to play: 1000
 ```
 
-A benchmarker with more custom parameters (`run/benchmarker.py`) is also available.
+A benchmarker with more custom parameters (e.g. running variant games) (`run/benchmarker.py`) is also available.
 
 A single game can be run using the raw graded programs `build/normal_graded` and `build/weighted_torus_graded`:
 
@@ -120,8 +120,8 @@ The success rate of the solver (probability of finishing a game without clicking
 
 | Strategy                        | 8-8-T10       | 16-16-T40     | 30-16-T99     |
 |---------------------------------|---------------|---------------|---------------|
-| *Sweepmine (this project)*    | *81.62%*        | *77.48%*        | *38.20%*     | 
 | PSEQ-D256 (Tu et al. 2017)      | 81.79%        | 78.2%         | 40.06%        |
+| *Sweepmine (this project)*    | *81.62%*        | *77.48%*        | *38.20%*     | 
 | OH (Buffet et al. 2013)        | 80.2%        | 74.4%        | 38.7%        |
 | cSimEnuLoClf (Legendre et al. 2012) | 80%    | 75.6%        | 37.5%        |
 | CSP (Studholme 2000)           | 80.0%        | 44.3%        | 33.9%        |
