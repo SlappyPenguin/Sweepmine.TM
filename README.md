@@ -76,6 +76,20 @@ For `weighted_torus_ungraded`, this should be of the form:
 - Lines 2 to $R+1$: A grid with the same format as `vector<vector<int>> grid`
 - Lines $R+2$ to $2R+1$: A grid of charges with the same format as `vector<vector<int>> charge`
 
+## Technical Details
+The solver always tries to find a certain move (clicking a garunteed safe square, or flagging a certain mine), before resorting to probabilistic risk-taking.
+
+### (1) Simple Logic
+We try to apply the 2 simplest logical rules:
+
+- If any square has # surrounding mines = # surrounding flags, all other surrounding squares are safe
+- If any square has # surrounding mines = # surrounding uncovered squares, they all have mines
+
+### (2) Gaussian Elimination
+
+
+### (3) Backtracking + Guessing
+
 ## Performance
 The success rate of the solver (probability of finishing a game without clicking a mine) is on par with frontier research models for all 3 standard board sizes:
 
@@ -94,27 +108,3 @@ The success rate of the solver (probability of finishing a game without clicking
 Our benchmark was measured by running `run/simple_benchmarker.py` for $10^4$ games on each board size. The rest of the table was supplied by [this paper](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
 
 Our solver averages 6.03 seconds per 100 games on the Expert board size (16-30-T99). For comparison, the human world record for a singular Expert game is [26.59 seconds](https://minesweepergame.com/world-records.php).
-
-## Technical Details
-
-### Map Generation
-
-When `sweepmine` is not in debug mode (i.e. provided a grid), pseudo-adaptive automatic map generation kicks into play. The first cell revealed by the algorithm will always be a non-mine. However, it is **not** guaranteed that the map is solvable from there using pure logic.
-
-Mines are placed via picking a set of random non-
-
-### (1) Logical Reduction
-
-This is only perfomed when mines are non-weighted.
-
-TODO
-
-### (2) Gaussian Elimination
-
-This is only performed when mines are non-weighted.
-
-TODO
-
-### (3) Probabilistic Backtrack
-
-TODO
