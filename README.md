@@ -79,7 +79,7 @@ The success rate of the solver (probability of finishing a game without clicking
 | LBP-MC (Kamenetsky and Teo 2007) | 78.6%      | 44.8%        |               |
 | PGMS (Ramsdell 1995)           | 71%          | 36 %          | 26%          |
 
-Our benchmark was measured by running `run/simple_benchmarker.py` for 10^4 games on each board size. The rest of the table was supplied by [this paper](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
+Our benchmark was measured by running `run/simple_benchmarker.py` for $10^4$ games on each board size. The rest of the table was supplied by [this paper](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
 
 Our solver averages 6.03 seconds per 100 games on the Expert board size (16-30-T99). For comparison, the human world record for a singular Expert game is [26.59 seconds](https://minesweepergame.com/world-records.php).
 
