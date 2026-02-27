@@ -68,7 +68,7 @@ Between the creation of the original problem statement and now, `benchmarker.py`
 
 The graded programs `normal_graded` and `weighted_torus_graded` accept input via `stdin` and write to `data/sweepmine.out`. The input to these programs (executed alone by running `../build/normal_graded` etc.) matches the grader expected input in the original problem statement.
 
-The non-graded programs `normal_ungraded` and `weighted_torus_ungraded` accept input the same way that `next_move()` in problem statement accepts input.
+The non-graded programs `normal_ungraded` and `weighted_torus_ungraded` accept input the same way that `next_move()` in problem statement accepts input. Input is from `data/input.txt` and output is written to `data/output.txt`.
 
 For `normal_ungraded`, this should be of the form:
 - Line 1: $R$ $C$ $N$
