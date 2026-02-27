@@ -6,17 +6,17 @@ First input a position into `data/input.txt`.
 
 For `normal_ungraded.exe`, this should be of the form:
 
-{number of rows} {number of columns} {number of bombs}
+$R$ $C$ $N$
 
-{state of each grid cell}
+$grid[i][j] for all (i, j)$
 
 For `weighted_torus_ungraded.exe`:
 
-{number of rows} {number of columns} {number of bombs} {is it a torus?}
+$R$ $C$ $N$ $T$
 
-{state of each grid cell}
+$grid[i][j] for all (i, j)$
 
-{weight of each grid cell}
+$charge[i][j] for all (i, j)$
 
 Then run:
 
