@@ -11,6 +11,8 @@ The solver also supports toroidal maps (wrap-around) and weighted mines. This pr
 | `/build` | Executables |
 | `/data` | Input/output files for solver |
 | `/draft` | Previous iteration |
+| `/images` | Visuals |
+| `/include` | Header files for C++ |
 | `/run` | Scripts to benchmark and visualise |
 | `/src` | Underlying C++ |
 
