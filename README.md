@@ -58,7 +58,7 @@ python visualiser.py
   <img src="images/visualiser.png" width="500"><br>
 </p>
 
-Note that individual game spots can also be solved using the ungraded programs (see `/build/README.md`).
+Note that individual game spots can also be solved using the ungraded programs (see below).
 
 ## Usage Notes
 
@@ -68,7 +68,16 @@ Between the creation of the original problem statement and now, `benchmarker.py`
 
 The graded programs `normal_graded` and `weighted_torus_graded` accept input via `stdin` and write to `data/sweepmine.out`. The input to these programs (executed alone by running `../build/normal_graded` etc.) matches the grader expected input in the original problem statement.
 
-The non-graded programs `normal_ungraded` and `weighted_torus_ungraded` accept input the same way that `next_move()` in problem statement accepts input. The first line contains $R$, $C$, $N$, $T$. After this follows a grid with the same format as `vector<vector<int>> grid`, and then a grid of charges with the same format as `vector<vector<int>> charge`.
+The non-graded programs `normal_ungraded` and `weighted_torus_ungraded` accept input the same way that `next_move()` in problem statement accepts input.
+
+For `normal_ungraded`, this should be of the form:
+- Line 1: $R$ $C$ $N$
+- Lines 2 to $R+1$: A grid with the same format as `vector<vector<int>> grid`
+  
+For `weighted_torus_ungraded`, this should be of the form:
+- Line 1: $R$ $C$ $N$ $T$
+- Lines 2 to $R+1$: A grid with the same format as `vector<vector<int>> grid`
+- Lines $R+2$ to $2R+1$: A grid of charges with the same format as `vector<vector<int>> charge`
 
 ## Performance
 The success rate of the solver (probability of finishing a game without clicking a mine) is on par with frontier research models for all 3 standard board sizes:
