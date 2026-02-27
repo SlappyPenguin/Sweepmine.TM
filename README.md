@@ -86,7 +86,7 @@ We try to apply the 2 simplest logical rules:
 - If any square's # surrounding mines = # surrounding uncovered squares, they are all mines
 
 ### (2) Gaussian Elimination
-We try more complex logic to find certain moves. The grid is abstracted into a CSP (Constraint Satisfaction Problem), which can be represented as a system of linear equations.
+We try more complex logic to find certain moves. The bordering cells are abstracted into a CSP, which can be represented as a system of linear equations.
 
 Specifically, each unknown cell forms a variable $x_{ij} \in \{0, 1\}$, and each known tile combines its adjacent unknown cells into an equation. Say a known cell showing value $v_{k}$ has neighbours $\{x_1,x_2,\dots,x_n\}$. Then, $v_k = \sum_{i=1}^nc_ix_i$.
 
