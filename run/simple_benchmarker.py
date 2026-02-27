@@ -4,7 +4,7 @@ import time
 file = "../build/normal_graded"
 level_map = {"easy" : 0, "medium" : 1, "hard" : 2}
 level_info = {
-    0 : (9, 9, 10),
+    0 : (8, 8, 10),
     1 : (16, 16, 40),
     2 : (16, 30, 99) 
 }

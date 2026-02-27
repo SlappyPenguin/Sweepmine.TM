@@ -1,6 +1,6 @@
 /*
-Used for debugging purposes. Instead of being linked to the grader, it reads input from data/input.txt and writes
-output to data/output.txt, in the format of the grader. 
+Used for debugging purposes. Instead of being linked to the grader, it reads an input grid from data/input.txt and 
+writes the next move to data/output.txt.
 */
 
 #include "../../include/normal.h"

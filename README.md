@@ -1,20 +1,20 @@
 # Sweepmine.TM
 
-An advanced minesweeper algorithm built on advanced game theory research, achieving frontier level speeds and accuracy (see this [example paper](/draft/local/Sweepmine.TM/15091-68459-1-PB.pdf)). Also able to solve toroidal maps (wrap-arounds) and weighted mines.
+A fast Minesweeper AI with success rate near frontier research models. The solver abstracts the Minesweeper grid into a constraint satisfaction problem (CSP), which is solved using logical deduction, Gaussian-elimination, and recursive backtracking. The solutions to the CSP are used to determine a garunteed safe move (if any exists) or a probabilistically optimal move otherwise. 
 
-## Credits
+The solver also supports toroidal maps (wrap-around) and weighted mines.
 
-A joint project between Matthew Gu and Austin Song.
+This project was originally intended as a problem for a contest setting (see `statement.pdf`). 
 
 ## Directory
 
-| Type | Folder | Contents |
-|---------|---------|-----------|
-| Executables | `/bin` | Compiled `sweepmine` binary |
-| Game data | `/data` | Raw debug output and game data from `sweepmine` |
-| Draft files | `/draft` | Historical/draft files (antiquated) |
-| Run scripts | `/run` | Most scripts for interface usage |
-| Source code | `/src` | Underlying C++ scripts, bot variations |
+| Folder | Contents |
+|---------|-----------|
+| `/build` | Executables |
+| `/data` | Input/output files for solver |
+| `/draft` | Previous iteration |
+| `/run` | All scripts needed to benchmark and visualise |
+| `/src` | Underlying C++ |
 
 ## Usage (Local)
 
