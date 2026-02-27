@@ -61,10 +61,7 @@ python visualiser.py
 Note that individual game spots can also be solved using the ungraded programs (see below).
 
 ## Usage Notes
-
 For `visualiser.py` usage information, see the final page of attached [`statement.pdf`](statement.pdf).
-
-Between the creation of the original problem statement and now, `benchmarker.py` has undergone changes. It will prompt the user more verbosely for input. There is futhermore an easier `simple_benchmarker.py` which only runs normal minesweeper games at fixed presets. 
 
 The graded programs `normal_graded` and `weighted_torus_graded` accept input via `stdin` and write to `data/sweepmine.out`. The input to these programs (executed alone by running `../build/normal_graded` etc.) matches the grader expected input in the original problem statement.
 
