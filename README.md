@@ -55,7 +55,7 @@ python visualiser.py
 Note that individual game spots can also be solved using the ungraded programs (see `/build`).
 
 ## Performance
-The success rate of the solver is on par with frontier research models for all 3 standard game sizes:
+The success rate of the solver (probability of finishing a game without clicking a mine) is on par with frontier research models for all 3 standard board sizes:
 
 | Strategy                        | 8-8-T10       | 16-16-T40     | 30-16-T99     |
 |---------------------------------|---------------|---------------|---------------|
@@ -68,6 +68,8 @@ The success rate of the solver is on par with frontier research models for all 3
 | LSWPE (Pedersen 2004)          |               | 67.7 %        | 25.0 %        |
 | LBP-MC (Kamenetsky and Teo 2007) | 78.6 %      | 44.8 %        |               |
 | PGMS (Ramsdell 1995)           | 71 %          | 36 %          | 26 %          |
+
+Our benchmark was measured by running `run/simple_benchmarker.py` for 10^4 games on each board size. The rest of the table was supplied by [this paper](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
 
 Easy 81.62 2.08
 
