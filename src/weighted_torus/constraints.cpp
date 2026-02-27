@@ -1,23 +1,43 @@
-#include "header.h"
+/*
+Abstracts the board state into a constraint satisfaction problem (CSP). Each non-zero revealed square defines its
+own constraint, i.e. that the squares around it (variables based on their weight) must sum to some target.
+*/
+
+#include "../../include/weighted_torus.h"
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<Constraint> constraints;
+vec<Constraint> constraints;
+static void init() {
+    constraints.clear();
+}
 void make_constraints() {
-    int num_squares = num_rows * num_cols;
+    init();
+
+    int num_squares = get_num_squares();
     constraints.resize(num_squares + 1);
     for (int i = 1; i <= num_squares; i++) {
         Square square = {i};
-        if (grid[square.index()] == BLANK || grid[square.index()] == FLAG) continue;
-        if (square.num_adj_blanks() == 0) continue;
-        for (Square new_square : square.adj()) {
-            if (grid[new_square.index()] != BLANK) continue;
-            constraints[i].vars.push_back(new_square);
-            if (weight[new_square.index()] > 0) constraints[i].pos_sum_left += weight[new_square.index()];
-            else constraints[i].neg_sum_left += weight[new_square.index()];
+        const Cell& cell = grid[i];
+        Constraint& cons = constraints[i];
+        if (cell.state != State::Revealed) continue;
+        if (square.get_num_adj_hidden() == 0) continue;
+
+        cons.target_sum = cell.num_adj_bombs;
+        for (const Square& new_square : square.get_adj()) {
+            int index = new_square.get_index();
+            if (grid[index].state != State::Flagged) continue;
+            cons.target_sum -= weight[index];
         }
-        constraints[i].target_sum = grid[i];
-        for (Square new_square : square.adj())
-            if (grid[new_square.index()] == FLAG) constraints[i].target_sum -= weight[new_square.index()];
+
+        for (const Square& new_square : square.get_adj()) {
+            int index = new_square.get_index();
+            const Cell& new_cell = grid[index];
+            if (new_cell.state != State::Hidden) continue;
+            
+            cons.vars.push_back(new_square);
+            if (weight[index] > 0) cons.pos_sum_left += weight[index];
+            else cons.neg_sum_left += weight[index];
+        }
     }
 }

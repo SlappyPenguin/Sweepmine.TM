@@ -1,0 +1,55 @@
+/*
+Used for debugging purposes. Instead of being linked to the grader, it reads input from data/input.txt and writes
+output to data/output.txt, in the format of the grader. 
+*/
+
+#include "../../include/weighted_torus.h"
+#include <bits/stdc++.h>
+using namespace std;
+
+constexpr int HIDDEN_VALUE = 100;
+constexpr int FLAGGED_VALUE = 101;
+const string INPUT_FILE = "../data/input.txt";
+const string OUTPUT_FILE = "../data/output.txt";
+
+int num_rows, num_cols, num_bombs;
+bool is_torus;
+vec<Cell> grid;
+vec<int> weight;
+
+void read_input() {
+    ifstream file(INPUT_FILE);
+    file >> num_rows >> num_cols >> num_bombs >> is_torus;
+    int num_squares = get_num_squares();
+    grid.resize(num_squares + 1), weight.resize(num_squares + 1);
+    for (int i = 1; i <= num_squares; i++) {
+        int value; file >> value;
+        switch (value) {
+            case HIDDEN_VALUE: grid[i].state = State::Hidden; break;
+            case FLAGGED_VALUE: grid[i].state = State::Flagged; break;
+            default: grid[i].state = State::Revealed, grid[i].num_adj_bombs = value; 
+        }
+    }
+    for (int i = 1; i <= num_squares; i++) 
+        file >> weight[i];
+}
+void print_move(Move move) { 
+    ofstream file(OUTPUT_FILE);
+    file << move.is_flag << " " << move.square.row << " " << move.square.col << '\n'; 
+}
+
+void init() {
+    num_rows = num_cols = num_bombs = 0;
+    is_torus = false;
+    grid.clear(), weight.clear();
+}
+
+int main() {
+    init();
+    read_input();
+
+    make_constraints();
+    Move move = do_probability();
+    
+    print_move(move);
+}

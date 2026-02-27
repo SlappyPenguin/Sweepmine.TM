@@ -1,34 +1,58 @@
-#include "header.h"
+/*
+1) Connect all constraints which share variables (common squares) into graphical components
+
+2) Recursively backtrack to find all solutions (variable configurations) to this CSP 
+2.1) Optimise backtrack by fixing variables in decreasing order of adjacency size
+2.2) Optimise backtrack by checking involved constraints by increasing number of variables (more likely to early 
+exit) 
+2.3) Optimise backtrack by early exiting when sum of the component is impossible to achieve
+
+3) Assigns probabilities for every square being a bomb based on solutions
+3.1) Weights solutions based on how many ways there are to arrange remaining bombs on the board
+3.2) Squares which aren't variables get probabilities assigned based on if they could be a remaining bomb
+3.3) Prefer uncovering corner over edge over non-edge squares
+*/
+
+#include "../../include/weighted_torus.h"
 #include <bits/stdc++.h>
 using namespace std;
 
-static vector<vector<int>> adj;
+static vec<vec<int>> adj;
 static int num_comps;
-static vector<int> comp;
+static vec<int> comp;
 static void dfs(int u) {
     comp[u] = num_comps;
-    for (int v : adj[u])
-        if (comp[v] == 0) dfs(v);
+    for (int v : adj[u]) {
+        if (comp[v] != 0) continue;
+        dfs(v);
+    }
 }
 static void make_graph() {
-    int num_squares = num_rows * num_cols;
+    int num_squares = get_num_squares();
     adj.resize(num_squares + 1), comp.resize(num_squares + 1);
-    for (int i = 1; i <= num_squares; i++) 
-        for (Square new_square : constraints[i].vars) 
-            adj[i].push_back(new_square.index()), adj[new_square.index()].push_back(i);
     for (int i = 1; i <= num_squares; i++) {
-        if (!constraints[i].is_valid()) continue;
+        const Constraint& cons = constraints[i];
+        for (const Square& new_square : cons.vars) {
+            int j = new_square.get_index();
+            adj[i].push_back(j), adj[j].push_back(i);
+        }
+    }
+        
+    for (int i = 1; i <= num_squares; i++) {
+        const Constraint& cons = constraints[i];
+        if (cons.is_empty()) continue;
         if (comp[i] != 0) continue;
         num_comps++, dfs(i);
     }
 }
 
-static vector<vector<int>> constraint_sets; // Stores index 
+static vec<vec<int>> constraint_sets; // Stores index 
 static void make_sets() {
+    int num_squares = get_num_squares();
     constraint_sets.resize(num_comps + 1);
-    int num_squares = num_rows * num_cols;
     for (int i = 1; i <= num_squares; i++) {
-        if (!constraints[i].is_valid()) continue;
+        const Constraint& cons = constraints[i];
+        if (cons.is_empty()) continue;
         constraint_sets[comp[i]].push_back(i);
     }
 }
@@ -40,79 +64,104 @@ static void print_sets() {
     }
 }
 
-static vector<vector<vector<int>>> configs;
-static vector<pair<int, bool>> vars; // bool: is this var set?
-static unordered_set<int> total_vars;
+static vec<vec<vec<int>>> configs;
+static vec<pair<int, bool>> vars; // Boolean stores: is this var set?
+static hset<int> total_vars;
 static void backtrack(int comp, int index) {
     if (index == (int) vars.size()) {
-        vector<int> answer;
-        for (pair<int, bool> var : vars)
-            if (var.second) answer.push_back(var.first);
-        configs[comp].push_back(answer);
+        vec<int> ans;
+        for (const pair<int, bool>& var : vars) {
+            if (!var.second) continue;
+            ans.push_back(var.first);
+        }
+        configs[comp].push_back(ans);
         return;
     }
+
     int var = vars[index].first;
     for (int value : {0, weight[var]}) {
-        int halt_constraint = 0;
+        int halt_index = 0;
         for (int i : adj[var]) {
-            constraints[i].sum += value;
-            if (weight[var] > 0) constraints[i].pos_sum_left -= weight[var];
-            else constraints[i].neg_sum_left -= weight[var];
-            int maximal_sum = constraints[i].sum + constraints[i].pos_sum_left;
-            int minimal_sum = constraints[i].sum + constraints[i].neg_sum_left;
-            if (!(minimal_sum <= constraints[i].target_sum && constraints[i].target_sum <= maximal_sum)) halt_constraint = i;
-            if (halt_constraint != 0) break;
+            Constraint& cons = constraints[i];
+            cons.sum += value;
+            if (weight[var] > 0) cons.pos_sum_left -= weight[var];
+            else cons.neg_sum_left -= weight[var];
+ 
+            int maximal_sum = cons.sum + cons.pos_sum_left;
+            int minimal_sum = cons.sum + cons.neg_sum_left;
+
+            if (cons.target_sum < minimal_sum) halt_index = i;
+            if (cons.target_sum > maximal_sum) halt_index = i;
+            if (halt_index != 0) break;
         }
-        if (halt_constraint != 0) {
+
+        if (halt_index != 0) {
             for (int i : adj[var]) {
-                constraints[i].sum -= value;
-                if (weight[var] > 0) constraints[i].pos_sum_left += weight[var];
-                else constraints[i].neg_sum_left += weight[var];
-                if (i == halt_constraint) break;
+                Constraint& cons = constraints[i];
+                cons.sum -= value;
+                if (weight[var] > 0) cons.pos_sum_left += weight[var];
+                else cons.neg_sum_left += weight[var];
+                if (i == halt_index) break;
             }
             continue;
         }
-        vars[index].second = value;
+
+        vars[index].second = value; // weight[var] != 0
         backtrack(comp, index + 1);
         for (int i : adj[var]) {
-            constraints[i].sum -= value;
-            if (weight[var] > 0) constraints[i].pos_sum_left += weight[var];
-            else constraints[i].neg_sum_left += weight[var];
+            Constraint& cons = constraints[i];
+            cons.sum -= value;
+            if (weight[var] > 0) cons.pos_sum_left += weight[var];
+            else cons.neg_sum_left += weight[var];  
         }
     }
+}
+static bool constraint_comp(int i, int j) {
+    return constraints[i].vars.size() < constraints[j].vars.size();
+}
+static bool var_comp(pair<int, bool> x, pair<int, bool> y) {
+    return adj[x.first].size() > adj[y.first].size();
 }
 static void make_configs() {
     configs.resize(num_comps + 1);
     for (int i = 1; i <= num_comps; i++) {
-        unordered_set<int> var_set;
-        for (int j : constraint_sets[i])
-            for (Square square : constraints[j].vars)
-                var_set.insert(square.index());
+        hset<int> var_set;
+        for (int j : constraint_sets[i]) {
+            const Constraint& cons = constraints[j];
+            for (const Square& square : cons.vars)
+                var_set.insert(square.get_index());
+        }          
+        append_hset(total_vars, var_set);
         
-        total_vars.insert(var_set.begin(), var_set.end());
-        vars.resize(var_set.size() + 1);
-        for (int j = 1; j <= (int) vars.size() - 1; j++) 
-            vars[j] = {*var_set.begin(), false}, var_set.erase(var_set.begin());
+        vars.clear(), vars.resize(var_set.size() + 1);
+        for (int j = 1; j <= (int) vars.size() - 1; j++) {
+            int index = *var_set.begin();
+            var_set.erase(var_set.begin());
+            vars[j] = {index, false};
+        }
         
-        auto constraint_comparator = [] (int j, int k) { return constraints[j].vars.size() < constraints[k].vars.size(); };
         for (int j = 1; j <= (int) vars.size() - 1; j++)
-            sort(adj[vars[j].first].begin(), adj[vars[j].first].end(), constraint_comparator);
-        auto var_comparator = [] (pair<int, bool> x, pair<int, bool> y) { return adj[x.first].size() > adj[y.first].size(); };
-        sort(vars.begin() + 1, vars.end(), var_comparator);
+            sort(adj[vars[j].first].begin(), adj[vars[j].first].end(), constraint_comp);
+        sort(vars.begin() + 1, vars.end(), var_comp);
+
         backtrack(i, 1);
     }
 }
 
-static vector<vector<int>> total_configs;
-static vector<int> config;
-static void make_total_configs(int index) {
-    if (index == num_comps + 1) { total_configs.push_back(config); return; }
-    for (vector<int> new_config : configs[index]) {
-        config.insert(config.end(), new_config.begin(), new_config.end());
+static vec<vec<int>> total_configs;
+static vec<int> config;
+static void make_total_configs(int index = 1) {
+    if (index == num_comps + 1) { 
+        total_configs.push_back(config); 
+        return; 
+    }
+    for (const vec<int>& new_config : configs[index]) {
+        append_vec(config, new_config);
         make_total_configs(index + 1);
-        config.erase(config.end() - new_config.size(), config.end());
+        pop_vec(config, new_config);
     }
 }
+
 static void print_total_configs() {
     cout << "# CONFIGS: " << total_configs.size() << endl;
     for (int i = 0; i < (int) total_configs.size(); i++) {
@@ -125,93 +174,110 @@ static void print_total_configs() {
     }
 }
 
-static vector<long double> scores, score; // First is by #bombs left
-static vector<long double> probs, prob; 
+// # ways that this # bombs could be placed on the non-variable squares
+// = nCr(# blanks, # bombs)
+static vec<ldoub> num_ways;
+static vec<ldoub> prob_num_bombs, prob; 
 static void make_probs() {
-    int num_squares = num_rows * num_cols;
-    scores.resize(num_bombs + 1), score.resize(num_squares + 1);
-    probs.resize(num_bombs + 1), prob.resize(num_squares + 1);
+    int num_squares = get_num_squares();
+    num_ways.resize(num_bombs + 1), prob_num_bombs.resize(num_bombs + 1), prob.resize(num_squares + 1);
 
     int num_non_var_blanks = -total_vars.size();
-    for (int i = 1; i <= num_squares; i++) num_non_var_blanks += (grid[i] == BLANK);
-    int num_non_flag_bombs = num_bombs;
-    for (int i = 1; i <= num_squares; i++) num_non_flag_bombs -= (grid[i] == FLAG);
+    for (int i = 1; i <= num_squares; i++) 
+        num_non_var_blanks += (grid[i].state == State::Hidden);
 
-    scores[0] = 1;
-    for (int num_bombs_left = 1; num_bombs_left <= num_bombs; num_bombs_left++) 
-        scores[num_bombs_left] = scores[num_bombs_left - 1] *
-                                 (num_non_var_blanks - num_bombs_left + 1) /
-                                 num_bombs_left;     
+    int num_non_flag_bombs = num_bombs;
+    for (int i = 1; i <= num_squares; i++) 
+        num_non_flag_bombs -= (grid[i].state == State::Flagged);
+
+    num_ways[0] = 1;
+    for (int num_bombs_left = 1; num_bombs_left <= num_bombs; num_bombs_left++) {
+        num_ways[num_bombs_left] = num_ways[num_bombs_left - 1] *
+                                  (num_non_var_blanks - num_bombs_left + 1) / num_bombs_left;     
+    }
     
-    long double score_sum = 0;
-    for (vector<int> new_config : total_configs) { 
+    ldoub total_num_ways = 0;
+    for (const vec<int>& new_config : total_configs) { 
         int num_bombs_left = num_non_flag_bombs - new_config.size();
         if (num_bombs_left < 0) continue;
-        long double new_score = scores[num_bombs_left];
-        score_sum += new_score, probs[num_bombs_left] += new_score;
-        for (int i : new_config) score[i] += new_score;
+
+        ldoub new_num = num_ways[num_bombs_left];
+        total_num_ways += new_num, prob_num_bombs[num_bombs_left] += new_num;
+        for (int i : new_config) 
+            prob[i] += new_num;
     }
 
+    for (int i : total_vars) 
+        prob[i] /= total_num_ways;
     for (int num_bombs_left = 0; num_bombs_left <= num_bombs; num_bombs_left++) {
-        probs[num_bombs_left] /= score_sum;
+        prob_num_bombs[num_bombs_left] /= total_num_ways;
         for (int i = 1; i <= num_squares; i++) {
-            if (grid[i] != BLANK) continue;
+            if (grid[i].state != State::Hidden) continue;
             if (total_vars.count(i)) continue;
-            prob[i] += probs[num_bombs_left] * num_bombs_left / num_non_var_blanks;
+            prob[i] += prob_num_bombs[num_bombs_left] * num_bombs_left / num_non_var_blanks;
         }
     }
-    for (int i : total_vars) prob[i] = score[i] / score_sum; 
 }
 static void print_probs() {
-    cout << fixed << setprecision(3);
+    cerr << fixed << setprecision(3);
     for (int i = 1; i <= num_rows; i++) {
         for (int j = 1; j <= num_cols; j++) {
-            Square s = {i, j};
-            cout << prob[s.index()] << " ";
+            Square square = {i, j};
+            cerr << prob[square.get_index()] << " ";
         }
-        cout << endl;
+        cerr << endl;
     }
 }
 
-static bool is_equal(long double x, long double y) {
-    if (x > y) swap(x, y); 
-    if (y == 0) return true;
-    return (x / y >= 0.99);
+static void init() {
+    num_comps = 0;
+    adj.clear(), comp.clear();
+    constraint_sets.clear();
+    configs.clear(), vars.clear(), total_vars.clear();
+    total_configs.clear(), config.clear();
+    num_ways.clear(), prob_num_bombs.clear(), prob.clear();
 }
 
 Move do_probability() {
+    init();
+    
     make_graph();
     make_sets();
     // print_sets();
+
     make_configs();
-    make_total_configs(1);
-    print_total_configs();
+    make_total_configs();
+    // print_total_configs();
+
     make_probs();
-    print_probs();    
+    // print_probs();    
 
-    int num_squares = num_rows * num_cols;
-    Move answer;
+    int num_squares = get_num_squares();
+    pair<bool, Move> ans = {false, {}};
     for (int i = 1; i <= num_squares; i++) {
-        if (grid[i] != BLANK) continue;
-        if (is_equal(prob[i], 1)) answer = {true, {i}};
+        if (grid[i].state != State::Hidden) continue;
+        if (!is_equal(prob[i], 1)) continue;
+        ans = {true, {true, {i}}};
     }
-    if (answer.is_valid()) return answer;
+    if (ans.first) return ans.second;
 
-    long double min_prob = numeric_limits<long double>::infinity();
+    ldoub min_prob = INF;
     for (int i = 1; i <= num_squares; i++) {
-        if (grid[i] != BLANK) continue;
+        if (grid[i].state != State::Hidden) continue;
         min_prob = min(min_prob, prob[i]);
     }
     for (int i = 1; i <= num_squares; i++) {
-        if (grid[i] != BLANK) continue;
+        if (grid[i].state != State::Hidden) continue;
         if (!is_equal(prob[i], min_prob)) continue;
+
         Square square = {i};
-        if (square.is_corner()) answer = {false, {i}};
-        else if (square.is_edge()) {
-            if (!answer.is_valid() || !answer.square.is_corner()) answer = {false, {i}};
-        } else { 
-            if (!answer.is_valid()) answer = {false, {i}}; 
-        }
+        if (square.is_corner())  
+            ans = {true, {false, {i}}};
+        else if (square.is_edge() && (!ans.first || !ans.second.square.is_corner()))
+            ans = {true, {false, {i}}};
+        else if (!ans.first)
+            ans = {true, {false, {i}}};
     }
-    return answer;
+    assert(ans.first);
+    return ans.second;
 }
