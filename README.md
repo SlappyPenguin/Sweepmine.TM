@@ -1,6 +1,6 @@
 # Sweepmine.TM
 
-A fast Minesweeper AI with success rate near frontier research models. The solver abstracts the Minesweeper grid into a constraint satisfaction problem (CSP), which is solved using logical deduction, Gaussian-elimination, and recursive backtracking. The solutions to the CSP are used to determine a garunteed safe move (if any exists) or a probabilistically optimal move otherwise. 
+A fast Minesweeper AI with success rate on par with frontier research models. The solver abstracts the Minesweeper grid into a constraint satisfaction problem (CSP), which is solved using logical deduction, Gaussian-elimination, and recursive backtracking. 
 
 The solver also supports toroidal maps (wrap-around) and weighted mines. This project was originally intended as a problem for a contest setting (see `statement.pdf`). 
 
@@ -54,6 +54,26 @@ python visualiser.py
 
 Note that individual game spots can also be solved using the ungraded programs (see `/build`).
 
+## Performance
+The success rate of the solver is on par with frontier research models for all 3 standard game sizes:
+
+| Strategy                        | 8-8-T10       | 16-16-T40     | 30-16-T99     |
+|---------------------------------|---------------|---------------|---------------|
+| **Sweepmine (this project)**    | 81.62%        | 77.48%        | 38.20%        | 
+| PSEQ-D256 (Tu et al. 2017)      | 81.79%        | 78.2%         | 40.06%        |
+| OH (Buffet et al. 2013)        | 80.2 %        | 74.4 %        | 38.7 %        |
+| cSimEnuLoClf (Legendre et al. 2012) | 80 %    | 75.6 %        | 37.5 %        |
+| CSP (Studholme 2000)           | 80.0 %        | 44.3 %        | 33.9 %        |
+| CSCSP (Becerra 2015)           |               | 75.94 %       | 32.90 %       |
+| LSWPE (Pedersen 2004)          |               | 67.7 %        | 25.0 %        |
+| LBP-MC (Kamenetsky and Teo 2007) | 78.6 %      | 44.8 %        |               |
+| PGMS (Ramsdell 1995)           | 71 %          | 36 %          | 26 %          |
+
+Easy 81.62 2.08
+
+Medium 77.58 2.75
+
+Hard 38.20 6.03
 
 ## Technical Details
 
