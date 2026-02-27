@@ -52,7 +52,7 @@ cd run
 python visualiser.py
 ```
 
-Note that individual game spots can also be solved using the ungraded programs (see `/build`).
+Note that individual game spots can also be solved using the ungraded programs (see `/build/README.md`).
 
 ## Performance
 The success rate of the solver (probability of finishing a game without clicking a mine) is on par with frontier research models for all 3 standard board sizes:
