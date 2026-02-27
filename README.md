@@ -86,12 +86,18 @@ We try to apply the 2 simplest logical rules:
 - If any square's # surrounding mines = # surrounding uncovered squares, they are all mines
 
 ### (2) Gaussian Elimination
-We try more complex logic to find certain moves. The grid is abstracted into a CSP, which can be represented as a system of linear equations. To find if any variable must have a fixed value, we run Gaussian Elimination.
+We try more complex logic to find certain moves. The grid is abstracted into a CSP (Constraint Satisfaction Problem), which can be represented as a system of linear equations.
+
+Specifically, each unknown cell forms a variable $x_{ij} \in \{0, 1\}$, and each known tile combines its adjacent unknown cells into an equation. Say a known cell showing value $v_{k}$ has neighbours $\{x_1,x_2,\dots,x_n\}$. Then, $v_k = \sum_{i=1}^nc_ix_i$.
+
+By building a system of these linear equations, we have a general way to deterministically solve all logic-based game situations. Solving implements row-reduction via Gaussian elimination, and determining fixed-value variables via back-substitution. These known cells can then be safely flagged or revealed.
 
 ### (3) Backtracking + Guessing
-If (1) and (2) do not yield certain moves, we are forced to take risk. First, all possible solutions to the CSP are generated using (heavily optimised) recursive backtracking. 
+If (1) and (2) do not yield certain moves, we are forced to make probabilistic decisions. First, all possible solutions to the CSP (taking valid variables as all unrevealed cells bordering revealed ones) are generated using recursive backtracking.
 
-Using combinatorics allows us to calculate the number of ways each solution could occur (# bomb arrangements on rest of board). Thus, we can assign probabilities for each square being a bomb. The lowest probability square is chosen with [heuristic preference for corners and edges](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
+This backtrack is heavily optimised using a combination of early-exit conditions and heuristic state prioritisations. Furthermore, we reduce state-space by splitting variables into a set of independent 'connected components'. These optimisations make this theoretically exponential-time algorithm run extremely fast in practice.
+
+Basic combinatorics allows us to assign an 'entropy' (moreso the microscopic configuration number $\Omega$) to each cell state. The probability of a cell being in said state then directly correlates to this entropic value. Ties are broken with [heuristic preference for corners and edges](https://cdn.aaai.org/ocs/ws/ws0294/15091-68459-1-PB.pdf).
 
 ## Performance
 The success rate of the solver (probability of finishing a game without clicking a mine) is on par with frontier research models for all 3 standard board sizes:
