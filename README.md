@@ -96,7 +96,7 @@ The solver always tries to find a certain move (revealing a guaranteed safe cell
 ### (1) Simple Logic
 We try to apply the 2 simplest logical rules:
 
-- If any square's $|\text{surrounding mines}| = |\text{surrounding uncovered squares}|$, all other surrounding squares are safe
+- If any square's $|\text{surrounding mines}|=|\text{surrounding uncovered squares}|$, all other surrounding squares are safe
 - If any square's # surrounding mines = # surrounding uncovered squares, they are all mines
 
 ### (2) Gaussian Elimination
