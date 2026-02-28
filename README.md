@@ -52,16 +52,7 @@ Enter number of games to play: 1000
 
 A benchmarker with more custom parameters (e.g. running variant games) (`run/benchmarker.py`) is also available.
 
-A single game can be run using the raw graded programs `build/normal_graded` and `build/weighted_torus_graded`:
-
-``` bash
-cd run
-../build/normal_graded
-# Example - running "hard" with no modifiers or debug mode
-16 30 99 0 0 0
-```
-
-If `data/sweepmine.out` is populated (through either benchmarking or a direct execution of the graded binaries), the game contained there can be visualised:
+If `data/sweepmine.out` is populated (through either benchmarking or execution of the graded executables), the game contained there can be visualised:
 
 ``` bash
 cd run
@@ -74,12 +65,19 @@ An example mid-game board screen is shown below:
   <img src="images/visualiser.png" width="500"><br>
 </p>
 
-Note that individual game spots can also be solved using the ungraded programs (see below).
+Note that single games and individual game spots can also be solved using the executables directly (see below).
 
 ## Usage Notes
 For `visualiser.py` UI and usage information, see the final page of attached [`statement.pdf`](statement.pdf).
 
 The graded programs `normal_graded` and `weighted_torus_graded` accept input via `stdin` and write to `data/sweepmine.out`. The input to these programs (executed alone by running `../build/normal_graded` etc.) matches the grader expected input in the original problem statement.
+
+``` bash
+cd run
+../build/normal_graded
+# Example - running "hard" with no modifiers or debug mode
+16 30 99 0 0 0
+```
 
 The non-graded programs `normal_ungraded` and `weighted_torus_ungraded` accept input the same way that `next_move()` in problem statement accepts input. Input is from `data/input.txt` and output is written to `data/output.txt`.
 
